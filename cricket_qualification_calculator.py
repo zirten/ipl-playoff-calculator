@@ -2,9 +2,11 @@
 import itertools
 from tabulate import tabulate
 
+# Function to calculate probability percentage
 def calculate_probability(chances, total_scenarios):
     return f"{(chances / total_scenarios) * 100:.2f}%"
 
+# Function to combine results for table structure
 def update_combined_results(combined_results, team, chances, index,total_scenarios):
     probability = calculate_probability(chances, total_scenarios)
     existing_team = next((result for result in combined_results if result[0] == team), None)
@@ -15,6 +17,7 @@ def update_combined_results(combined_results, team, chances, index,total_scenari
         new_team[0] = team
         new_team[index] = probability
         combined_results.append(new_team)
+
 # Function to simulate outcome
 def simnulate_outcomes(teams, initial_points, remaining_matches, considerDraw, winPoint=2, drawPoint=1, losePoint=0):
     # Generating all possible outcomes of the remaining matches
@@ -65,12 +68,15 @@ def simnulate_outcomes(teams, initial_points, remaining_matches, considerDraw, w
             }
             ranks.append(rank_info)
             current_rank += 1
-        # Adjust ranks for teams with equal points to be the same
+        # Adjust ranks for teams with equal points to be the same for nrr and points too
         rank_counter = 1
         for i in range(1, len(ranks)):
             if ranks[i]['points'] == ranks[i-1]['points']:
-                ranks[i-1]['rank'] = ranks[i]['rank']
                 ranks[i]['nrrrank'] = ranks[i-1]['nrrrank']
+        for i in range(len(ranks)-1,0,-1):
+            if ranks[i]['points'] == ranks[i-1]['points']:
+                ranks[i-1]['rank'] = ranks[i]['rank']
+        # calculating and adding in scenarios where teams get qualified
         for team in teams:
             rank = next(rank_info['rank']
                         for rank_info in ranks if rank_info['team'] == team)
@@ -95,7 +101,7 @@ def simnulate_outcomes(teams, initial_points, remaining_matches, considerDraw, w
         for team, chances in team_chances[category].items():
             update_combined_results(combined_results, team, chances, index,total_scenarios)
     # Sort the combined results based on the team name
-    # sorted_results = sorted(combined_results, key=lambda x: x[0])
+    # sorting results from col 2 to 4 while striping percent
     sorted_results = sorted(combined_results, key=lambda x: (float(x[1].strip("%")), float(
         x[2].strip("%")), float(x[3].strip("%")), float(x[4].strip("%"))), reverse=True)
 
