@@ -5,9 +5,9 @@ considerDraw = False
 winPoint = 2 #points if won
 drawPoint = 1 #points if draw
 losePoints = 0 #negative points if lost, enter it as negativei.e -1,-2 etc it will be added to the points table
-calculateTop2Nrr = False #check for top 2 qualification by nrr
-calculateTop2Points = False #check for top 2 qualification by points alone
-calculateTop4Nrr = False #check for top 4 qualification by nrr
+calculateTop2Nrr = True #check for top 2 qualification by nrr
+calculateTop2Points = True #check for top 2 qualification by points alone
+calculateTop4Nrr = True #check for top 4 qualification by nrr
 calculateTop4Points = True #check for top 4 qualification by points alone
 
 
@@ -106,30 +106,43 @@ for outcome in possible_outcomes:
         if nrrRank <= 2 and calculateTop2Nrr:
             team_chances['top2nrr'][team] += 1
     total_scenarios += 1
-print(total_scenarios)
 
-# Calculating and print the chances for each team to finish in the top 4
+from tabulate import tabulate
+
+# Combine the results from different categories into a single list
+combined_results = []
 if calculateTop2Points:
-    print("TOP 2 Points")
-    sorted_results = sorted(team_chances['top2points'].items(), key=lambda x: x[1], reverse=True)
-    for team, chances in sorted_results:
+    for team, chances in team_chances['top2points'].items():
         probability = chances / total_scenarios
-        print(f"{team}: {probability * 100:.2f}%")
+        combined_results.append([team, f"{probability * 100:.2f}%", "", "", ""])
 if calculateTop2Nrr:
-    print("TOP 2 NRR")
-    sorted_results = sorted(team_chances['top2nrr'].items(), key=lambda x: x[1], reverse=True)
-    for team, chances in sorted_results:
+    for team, chances in team_chances['top2nrr'].items():
         probability = chances / total_scenarios
-        print(f"{team}: {probability * 100:.2f}%")
+        existing_team = next((result for result in combined_results if result[0] == team), None)
+        if existing_team:
+            existing_team[2] = f"{probability * 100:.2f}%"
+        else:
+            combined_results.append([team, "", f"{probability * 100:.2f}%", "", ""])
 if calculateTop4Points:
-    print("TOP 4 Points")
-    sorted_results = sorted(team_chances['top4points'].items(), key=lambda x: x[1], reverse=True)
-    for team, chances in sorted_results:
+    for team, chances in team_chances['top4points'].items():
         probability = chances / total_scenarios
-        print(f"{team}: {probability * 100:.2f}%")
+        existing_team = next((result for result in combined_results if result[0] == team), None)
+        if existing_team:
+            existing_team[3] = f"{probability * 100:.2f}%"
+        else:
+            combined_results.append([team, "", "", f"{probability * 100:.2f}%", ""])
 if calculateTop4Nrr:
-    print("TOP 4 NRR")
-    sorted_results = sorted(team_chances['top4nrr'].items(), key=lambda x: x[1], reverse=True)
-    for team, chances in sorted_results:
+    for team, chances in team_chances['top4nrr'].items():
         probability = chances / total_scenarios
-        print(f"{team}: {probability * 100:.2f}%")
+        existing_team = next((result for result in combined_results if result[0] == team), None)
+        if existing_team:
+            existing_team[4] = f"{probability * 100:.2f}%"
+        else:
+            combined_results.append([team, "", "", "", f"{probability * 100:.2f}%"])
+
+# Sort the combined results based on the team name
+sorted_results = sorted(combined_results, key=lambda x: (float(x[1].strip("%")), float(x[2].strip("%")), float(x[3].strip("%")), float(x[4].strip("%"))), reverse=True)
+
+# Print the combined results in a table format
+headers = ["Team", "Top 2 Points", "Top 2 NRR", "Top 4 Points", "Top 4 NRR"]
+print(tabulate(sorted_results, headers=headers, tablefmt="fancy_grid"))
