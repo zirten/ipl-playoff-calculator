@@ -97,35 +97,39 @@ for outcome in possible_outcomes:
     for team in teams:
         rank = next(rank_info['rank'] for rank_info in ranks if rank_info['team'] == team)
         nrrRank = next(rank_info['nrrrank'] for rank_info in ranks if rank_info['team'] == team)
-        if rank <= 4:
+        if rank <= 4 and calculateTop4Points:
             team_chances['top4points'][team] += 1 
-        if nrrRank <= 4:
+        if nrrRank <= 4 and calculateTop4Nrr:
             team_chances['top4nrr'][team] += 1
-        if rank <= 2:
+        if rank <= 2 and calculateTop2Points:
             team_chances['top2points'][team] += 1 
-        if nrrRank <= 2:
+        if nrrRank <= 2 and calculateTop2Nrr:
             team_chances['top2nrr'][team] += 1
     total_scenarios += 1
 print(total_scenarios)
 
 # Calculating and print the chances for each team to finish in the top 4
-print("TOP 2 Points")
-sorted_results = sorted(team_chances['top2points'].items(), key=lambda x: x[1], reverse=True)
-for team, chances in sorted_results:
-    probability = chances / total_scenarios
-    print(f"{team}: {probability * 100:.2f}%")
-print("TOP 2 NRR")
-sorted_results = sorted(team_chances['top2nrr'].items(), key=lambda x: x[1], reverse=True)
-for team, chances in sorted_results:
-    probability = chances / total_scenarios
-    print(f"{team}: {probability * 100:.2f}%")
-print("TOP 4 Points")
-sorted_results = sorted(team_chances['top4points'].items(), key=lambda x: x[1], reverse=True)
-for team, chances in sorted_results:
-    probability = chances / total_scenarios
-    print(f"{team}: {probability * 100:.2f}%")
-print("TOP 4 NRR")
-sorted_results = sorted(team_chances['top4nrr'].items(), key=lambda x: x[1], reverse=True)
-for team, chances in sorted_results:
-    probability = chances / total_scenarios
-    print(f"{team}: {probability * 100:.2f}%")
+if calculateTop2Points:
+    print("TOP 2 Points")
+    sorted_results = sorted(team_chances['top2points'].items(), key=lambda x: x[1], reverse=True)
+    for team, chances in sorted_results:
+        probability = chances / total_scenarios
+        print(f"{team}: {probability * 100:.2f}%")
+if calculateTop2Nrr:
+    print("TOP 2 NRR")
+    sorted_results = sorted(team_chances['top2nrr'].items(), key=lambda x: x[1], reverse=True)
+    for team, chances in sorted_results:
+        probability = chances / total_scenarios
+        print(f"{team}: {probability * 100:.2f}%")
+if calculateTop4Points:
+    print("TOP 4 Points")
+    sorted_results = sorted(team_chances['top4points'].items(), key=lambda x: x[1], reverse=True)
+    for team, chances in sorted_results:
+        probability = chances / total_scenarios
+        print(f"{team}: {probability * 100:.2f}%")
+if calculateTop4Nrr:
+    print("TOP 4 NRR")
+    sorted_results = sorted(team_chances['top4nrr'].items(), key=lambda x: x[1], reverse=True)
+    for team, chances in sorted_results:
+        probability = chances / total_scenarios
+        print(f"{team}: {probability * 100:.2f}%")
